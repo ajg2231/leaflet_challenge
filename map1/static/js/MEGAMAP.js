@@ -8,31 +8,32 @@ d3.json(queryUrl, function(data) {
   console.log(data);
 });
 
-function createFeatures(earthquakeData) {
+function getColor(depth) {
     
-    function onEachLayer(feature) {
-        return new L.circleMarker([feature.geometry.coordinates[1], feature.geometry.coordinates[0]], {
-          radius: getRadius(feature.properties.mag),
-          fillOpacity: 0.8,
-          color: getColor(feature.geometry.coordinates[2]),
-          fillColor: getColor(feature.geometry.coordinates[2])
-        });
+    if (depth >= 90) {
+      return "#FF5F65";
     }
-
-
-    function onEachFeature(feature, layer) {
-        layer.bindPopup("<h3>Location: " + feature.properties.place +
-        "</h3><hr><p><b>Date: </b>" + new Date(feature.properties.time) + "</p><p><b>Magnitude: </b>" + feature.properties.mag + "</p>" + "</p><p><b>Depth: </b>" + feature.geometry.coordinates[2] + "</p>");
+    else if (depth >= 70) {
+      return "#FCA35D";
     }
+    else if (depth>= 50) {
+     return "#FDB72A";
+    }
+    else if (depth >= 30) {
+      return "#F7DB11";
+    }
+    else if (depth >= 10) {
+      return "#DCF400";
+    }
+    else {
+      return "#A3F600";
+    }
+  
+  }
+function getRadius(magnitude) {
+    return magnitude ** 2;
+  }
 
-  var earthquakes = L.geoJSON(earthquakeData, {
-    onEachFeature: onEachFeature,
-    pointToLayer: onEachLayer
-  });
-
-
-  createMap(earthquakes);
-}
 
 function createMap(earthquakes) {
 
@@ -86,28 +87,28 @@ legend.onAdd = function (color) {
 legend.addTo(myMap);
 }
 
-function getColor(depth) {
+function createFeatures(earthquakeData) {
     
-    if (depth >= 90) {
-      return "#FF5F65";
+    function onEachLayer(feature) {
+        return new L.circleMarker([feature.geometry.coordinates[1], feature.geometry.coordinates[0]], {
+          radius: getRadius(feature.properties.mag),
+          fillOpacity: 0.8,
+          color: getColor(feature.geometry.coordinates[2]),
+          fillColor: getColor(feature.geometry.coordinates[2])
+        });
     }
-    else if (depth >= 70) {
-      return "#FCA35D";
+
+
+    function onEachFeature(feature, layer) {
+        layer.bindPopup("<h3>Location: " + feature.properties.place +
+        "</h3><hr><p><b>Date: </b>" + new Date(feature.properties.time) + "</p><p><b>Magnitude: </b>" + feature.properties.mag + "</p>" + "</p><p><b>Depth: </b>" + feature.geometry.coordinates[2] + "</p>");
     }
-    else if (depth>= 50) {
-     return "#FDB72A";
-    }
-    else if (depth >= 30) {
-      return "#F7DB11";
-    }
-    else if (depth >= 10) {
-      return "#DCF400";
-    }
-    else {
-      return "#A3F600";
-    }
-  
-  }
-function getRadius(magnitude) {
-    return magnitude ** 2;
-  }
+
+  var earthquakes = L.geoJSON(earthquakeData, {
+    onEachFeature: onEachFeature,
+    pointToLayer: onEachLayer
+  });
+
+
+  createMap(earthquakes);
+}
