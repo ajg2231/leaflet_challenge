@@ -1,114 +1,106 @@
-var queryUrl = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=2021-03-16&endtime=" +
+var url = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=2021-03-16&endtime=" +
   "2021-04-16&maxlongitude=-69.52148437&minlongitude=-123.83789062&maxlatitude=48.74894534&minlatitude=25.16517337";
 
-
-d3.json(queryUrl, function(data) {
-
-  createFeatures(data.features);
+d3.json(url, function(data) {
+  make(data.features);
   console.log(data);
 });
 
-function getColor(depth) {
-    
+function oco(depth) {
+
     if (depth >= 90) {
-      return "#FF5F65";
+      return "blue";
     }
     else if (depth >= 70) {
-      return "#FCA35D";
+      return "red";
     }
     else if (depth>= 50) {
-     return "#FDB72A";
+     return "green";
     }
     else if (depth >= 30) {
-      return "#F7DB11";
+      return "yellow";
     }
     else if (depth >= 10) {
-      return "#DCF400";
+      return "purple";
     }
     else {
-      return "#A3F600";
+      return "orange";
     }
-  
-  }
-function getRadius(magnitude) {
-    return magnitude ** 2;
+
   }
 
-
-function createMap(earthquakes) {
-
-  var darkmap = L.tileLayer("https://api.mapbox.com/styles/v1/mapbox/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}", {
-    attribution: "Map data &copy; <a href=\"https://www.openstreetmap.org/\">OpenStreetMap</a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, Imagery © <a href=\"https://www.mapbox.com/\">Mapbox</a>",
-    maxZoom: 18,
-    id: "dark-v10",
-    accessToken: API_KEY
-  });
-
-
-  var baseMaps = {
-
-    "Dark Map": darkmap
-  };
-
-  var overlayMaps = {
-    Earthquakes: earthquakes
-  };
-
-  var myMap = L.map("map", {
-    center: [
-      37.09, -95.71
-    ],
-    zoom: 5,
-    layers: [darkmap, earthquakes]
-  });
-
-  L.control.layers(baseMaps, overlayMaps, {
-    collapsed: false
-  }).addTo(myMap);
-
-
-
-
-  var legend = L.control({
-    position: 'bottomright'
-});
-
-
-legend.onAdd = function (color) {
-    var div = L.DomUtil.create('div', 'info legend');
-    depth = ["-10-10", "10-30", "30-50", "50-70", "70-90", "90+"];
-    colors = ["#A3F600", "#DCF400", "#F7DB11", "#FDB72A", "#FCA35D", "#FF5F65"]
-    div.innerHTML += "<h3>Depth</h3>"
-    for (var i = 0; i < depth.length; i++) {
-        div.innerHTML += '<i style="background:' + colors[i] + '"></i>' + depth[i] + '<br>';
+  function pir(mag) {
+      return mag ** 2;
     }
-    return div;
-}
-legend.addTo(myMap);
-}
 
-function createFeatures(earthquakeData) {
-    
-    function onEachLayer(feature) {
+function make(eqs) {
+
+    function ola(feature) {
         return new L.circleMarker([feature.geometry.coordinates[1], feature.geometry.coordinates[0]], {
-          radius: getRadius(feature.properties.mag),
+          radius: pir(feature.properties.mag),
           fillOpacity: 0.8,
-          color: getColor(feature.geometry.coordinates[2]),
-          fillColor: getColor(feature.geometry.coordinates[2])
+          color: oco(feature.geometry.coordinates[2]),
+          fillColor: oco(feature.geometry.coordinates[2])
         });
     }
 
-
-    function onEachFeature(feature, layer) {
+    function ofe(feature, layer) {
         layer.bindPopup("<h3>Location: " + feature.properties.place +
         "</h3><hr><p><b>Date: </b>" + new Date(feature.properties.time) + "</p><p><b>Magnitude: </b>" + feature.properties.mag + "</p>" + "</p><p><b>Depth: </b>" + feature.geometry.coordinates[2] + "</p>");
     }
 
-  var earthquakes = L.geoJSON(earthquakeData, {
-    onEachFeature: onEachFeature,
-    pointToLayer: onEachLayer
+  var qua = L.geoJSON(eqs, {
+    onEachFeature: ofe,
+    pointToLayer: ola
   });
 
+  cram(qua);
+}
 
-  createMap(earthquakes);
+function cram(qua) {
+
+  var dram = L.tileLayer("https://api.mapbox.com/styles/v1/mapbox/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}", {
+    attribution: "Map data &copy; <a href=\"https://www.openstreetmap.org/\">OpenStreetMap</a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, Imagery © <a href=\"https://www.mapbox.com/\">Mapbox</a>",
+    maxZoom: 18,
+    id: "dark-v10",
+    accessToken: KEY
+  });
+
+  var bam = {
+
+    "Dark Map": dram
+  };
+
+  var ovl = {
+    Earthquakes: qua
+  };
+
+  var ha = L.map("map", {
+    center: [
+      37.09, -95.71
+    ],
+    zoom: 5,
+    layers: [dram, qua]
+  });
+
+  L.control.layers(bam, ovl, {
+    collapsed: false
+  }).addTo(ha);
+
+
+  var leg = L.control({
+    position: 'bottomright'
+});
+
+leg.onAdd = function (color) {
+    var div = L.DomUtil.create('div', 'info legend');
+    dep = ["-10-10", "10-30", "30-50", "50-70", "70-90", "90+"];
+    col = ["blue", "red", "green", "yellow", "purple", "orange"]
+    div.innerHTML += "<h3>Depth</h3>"
+    for (var i = 0; i < depth.length; i++) {
+        div.innerHTML += '<i style="background:' + col[i] + '"></i>' + dep[i] + '<br>';
+    }
+    return div;
+}
+leg.addTo(ha);
 }
